@@ -1,7 +1,0 @@
-CHANGES
-=======
-
-* reverted init
-* prepping for pbr packaging
-* added docstrings, cleaned up a bit
-* init commit
