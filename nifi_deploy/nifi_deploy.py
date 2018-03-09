@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from nipyapi import templates, canvas
-import nifi
+from .nifi import NifiInstance
 
 
 def export_function(args):
@@ -16,7 +16,7 @@ def export_function(args):
     keep_template   = args.keep_template
 
     try:
-        n = nifi.NifiInstance(nifi_host, username=username, password=password)
+        n = NifiInstance(nifi_host, username=username, password=password)
     
         process_group = canvas.get_process_group(uuid, 'id')
         template = n.create_template(
@@ -43,7 +43,7 @@ def import_function(args):
     password        = args.password
     filename        = args.filename
 
-    n = nifi.NifiInstance(nifi_host, username=username, password=password)
+    n = NifiInstance(nifi_host, username=username, password=password)
 
     r = n.import_template(args.filename)
     if args.verbose:
