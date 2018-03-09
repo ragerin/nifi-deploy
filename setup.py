@@ -1,0 +1,3 @@
+setuptools.setup(
+    pbr=True
+)
