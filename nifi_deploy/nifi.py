@@ -7,12 +7,12 @@ wrapper library.
 import os
 import sys
 import getpass
-import requests
 
 from nipyapi import nifi, config, templates, canvas
 
 # Disable urllib3 certificate warnings
-requests.packages.urllib3.disable_warnings()
+from requests.packages.urllib3 import disable_warnings
+disable_warnings()
 
 
 class NifiInstance:
@@ -27,6 +27,7 @@ class NifiInstance:
         verify_ssl  (bool): Whether to verify SSL connection - UNUSED as of now.
 
     """
+
     def __init__(self, url=None, username=None, password=None, verify_ssl=False):
         config.nifi_config.host = self._get_url(url)
         config.nifi_config.verify_ssl = verify_ssl
@@ -99,6 +100,7 @@ class NifiInstance:
         Returns:
             None
         """
+
         templates.delete_template(template_id)
 
 
@@ -108,27 +110,17 @@ class NifiInstance:
         Arguments:
             template_id (str): ID of the template to export.
             file_path   (str): Optional, path of file to write the XML to.
-                               If `None`, write to stdout instead.
         
         Returns:
-            requests.Response
+            String (template xml)
         """
 
-        # This implementation is a workaround for
-        # https://github.com/Chaffelson/nipyapi/issues/42
-        headers = {'Authorization':'Bearer {}'.format(config.nifi_config.api_key[config.nifi_config.username])}
-        url = config.nifi_config.host + '/templates/' + template_id + '/download'
-        response = requests.get(url, headers=headers, verify=config.nifi_config.verify_ssl)
-        if file_path:
-            file_path = file_path.strip('\'"')
-            if os.path.isdir(file_path):
-                file_path = os.path.join(file_path, 'template.xml')
-            with open(file_path, 'w') as fd:
-                fd.write(response.content.decode())
-        else:
-            sys.stdout.write(response.content.decode())
+        template = templates.get_template(template_id, 'id').template
 
-        return response
+        output = 'file' if file_path else 'string'
+        content = templates.export_template(template.id, output=output, file_path=file_path)
+
+        return content 
     
 
     def import_template(self, file_path):
@@ -138,21 +130,9 @@ class NifiInstance:
             file_path   (str): Path of the XML file to import into Nifi as a template.
         
         Returns:
-            requests.Response
+            None
         """
 
-        # This implementation is a workaround for
-        # https://github.com/Chaffelson/nipyapi/issues/42
-        file_path = file_path.strip('\'"')
-        with open(file_path, 'r') as fd:
-            filename = os.path.basename(fd.name)
-            filedata = fd.read()
-            
-            files = {'template': (filename, filedata, 'text/xml')}
-            headers = {'Authorization': 'Bearer {}'.format(config.nifi_config.api_key[config.nifi_config.username])}
-
-            canvas_id = canvas.get_root_pg_id()            
-            url = config.nifi_config.host + '/process-groups/' + canvas_id + '/templates/upload'
-            response = requests.post(url, headers=headers, files=files, verify=config.nifi_config.verify_ssl)
-
-        return response
+        canvas_id = canvas.get_root_pg_id()
+        templates.upload_template(canvas_id, file_path)
+        

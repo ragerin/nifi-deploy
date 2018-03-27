@@ -31,8 +31,10 @@ def export_function(args):
             ).template.id
         
         r = n.export_template(template_id, filename)
-        if args.stdout and args.filename:
-            print(r.content.decode())
+        if args.stdout:
+            print(r)
+        elif not args.stdout and not args.filename:
+            print(r)
         
     finally:
         if not args.keep_template:
