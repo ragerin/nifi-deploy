@@ -94,15 +94,13 @@ class NifiInstance:
         """ Delete a template from Nifi template registry.
 
         Arguments:
-            tempplate_id (str): ID of the template to delete.
+            template_id (str): ID of the template to delete.
         
         Returns:
-            nipyapi.nifi.TemplateEntity
+            None
         """
-        template = templates.delete_template(template_id)
+        templates.delete_template(template_id)
 
-        return template
-    
 
     def export_template(self, template_id, file_path=None):
         """ Export a template as XML, and optionally write it to a file or stdout.

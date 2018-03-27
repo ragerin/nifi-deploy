@@ -36,7 +36,7 @@ def export_function(args):
         
     finally:
         if not args.keep_template:
-            r = n.delete_template(template_id)
+            n.delete_template(template_id)
 
 
 def import_function(args):
@@ -47,13 +47,13 @@ def import_function(args):
 
     n = NifiInstance(nifi_host, username=username, password=password)
 
-    r = n.import_template(args.filename)
+    n.import_template(args.filename)
 
 
 def cli():
     ### argparse setup
     parser = argparse.ArgumentParser(prog='nifi-deploy')
-    subparsers = parser.add_subparsers(title='Actions', help='Append --help to view action specific help')
+    subparsers = parser.add_subparsers(title='Actions', help='Append `--help` to view action specific help')
 
 
     ### export subparser
