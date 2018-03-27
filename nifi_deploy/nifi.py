@@ -5,6 +5,7 @@ wrapper library.
 """
 
 import os
+import sys
 import getpass
 import requests
 
@@ -87,14 +88,29 @@ class NifiInstance:
             )
 
         return template
+
+    
+    def delete_template(self, template_id):
+        """ Delete a template from Nifi template registry.
+
+        Arguments:
+            tempplate_id (str): ID of the template to delete.
+        
+        Returns:
+            nipyapi.nifi.TemplateEntity
+        """
+        template = templates.delete_template(template_id)
+
+        return template
     
 
     def export_template(self, template_id, file_path=None):
-        """ Export a template as XML, and optionally write it to a file.
+        """ Export a template as XML, and optionally write it to a file or stdout.
 
         Arguments:
             template_id (str): ID of the template to export.
             file_path   (str): Optional, path of file to write the XML to.
+                               If `None`, write to stdout instead.
         
         Returns:
             requests.Response
@@ -111,6 +127,8 @@ class NifiInstance:
                 file_path = os.path.join(file_path, 'template.xml')
             with open(file_path, 'w') as fd:
                 fd.write(response.content.decode())
+        else:
+            sys.stdout.write(response.content.decode())
 
         return response
     

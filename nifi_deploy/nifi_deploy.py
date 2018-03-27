@@ -1,8 +1,12 @@
-import sys
+""" 
+This file is used for the CLI tool.
+By default setup.py links `nifi-deploy` as an executable
+to this file.
+"""
+
 import argparse
 
-from nipyapi import templates, canvas
-from .nifi import NifiInstance
+from nifi import NifiInstance
 
 
 def export_function(args):
@@ -13,28 +17,26 @@ def export_function(args):
     name            = args.name
     description     = args.description
     filename        = args.filename
+    stdout          = args.stdout
     keep_template   = args.keep_template
 
+    n = NifiInstance(nifi_host, username=username, password=password)
+    template_id = None
+
     try:
-        n = NifiInstance(nifi_host, username=username, password=password)
-    
-        process_group = canvas.get_process_group(uuid, 'id')
-        template = n.create_template(
+        template_id = n.create_template(
             pg_id=uuid,
             name=name,
             desc=description
-            ).template        
-
-        xml = n.export_template(template.id, filename)
-        if not filename and args.verbose: # Write to stdout
-            print(xml)
-
+            ).template.id
+        
+        r = n.export_template(template_id, filename)
+        if args.stdout and args.filename:
+            print(r.content.decode())
+        
     finally:
         if not args.keep_template:
-            temp = templates.get_template_by_name(name)
-            r = templates.delete_template(temp.id)
-            if args.verbose:
-                print(r.status_code, r.content.decode())
+            r = n.delete_template(template_id)
 
 
 def import_function(args):
@@ -46,16 +48,15 @@ def import_function(args):
     n = NifiInstance(nifi_host, username=username, password=password)
 
     r = n.import_template(args.filename)
-    if args.verbose:
-        print(r.status_code, r.content.decode())
+
 
 def cli():
     ### argparse setup
     parser = argparse.ArgumentParser(prog='nifi-deploy')
-    parser.add_argument('-v', '--verbose', action='store_true')
     subparsers = parser.add_subparsers(title='Actions', help='Append --help to view action specific help')
 
 
+    ### export subparser
     example_usage = """EXAMPLE USAGE:
     nifi-deploy export -n https://nifihost:9090 -u john -p badpractice 0a7361fd-015f-1000-ffff-ffffd2cbc7a7 my_great_template -d template description -f c:\\temp\\my_great_template_export.xml
     """
@@ -66,11 +67,13 @@ def cli():
     parser_export.add_argument('-u', '--username', help='Nifi username, else using environment variable `NIFI_USERNAME`')
     parser_export.add_argument('-p', '--password', help='Nifi password, else using environment variable `NIFI_PASSWORD`')
     parser_export.add_argument('-d', '--description', help='Description of the template - also used internally if `--keep_template` is included')
-    parser_export.add_argument('-f', '--filename', help='Path to save exported XML to, else outputs to stdout')
+    parser_export.add_argument('-f', '--filename', help='Path to save exported XML to')
+    parser_export.add_argument('-s', '--stdout', action='store_true', default=False, help='Output exported XML to stdout - default if `--filename` is not supplied')
     parser_export.add_argument('-k', '--keep_template', action='store_true', default=False, help='Keep the template in Nifi after export, else exclusively export XML and delete the temporarily instantiated template')
     parser_export.set_defaults(func=export_function)
 
 
+    ### import subparser
     example_usage = """EXAMPLE USAGE:
     nifi-deploy import -n https://nifihost:9090 -u john -p badpractice c:\\temp\\my_great_template_export.xml
     """
@@ -82,6 +85,7 @@ def cli():
     parser_import.set_defaults(func=import_function)
 
 
+    ### show usage help
     args = parser.parse_args()
     if getattr(args, 'func', None):
         args.func(args)

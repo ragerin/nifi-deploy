@@ -1,1 +1,3 @@
-__all__     = ['nifi','nifi-deploy']
+__all__ = ['nifi','nifi-deploy']
+
+from nifi import NifiInstance
