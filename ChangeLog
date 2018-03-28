@@ -1,6 +1,18 @@
 CHANGES
 =======
 
+0.1.5
+-----
+
+* removed the changelog from .gitignore
+* deleted unnecessary spacing in setup.cfg
+* added pbr to build-requirements.txt
+* fixed some issues introduced in a45c240
+* updated NifiInstance methods to use the fixed api functions instead of requests
+* change return values of some NifiInstance methods that didn't make sense
+* refactored some coupling issues
+* updated nipyapi to 0.8.0, cleaned up requirements.txt
+
 0.1.4
 -----
 
