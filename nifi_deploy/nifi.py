@@ -61,10 +61,11 @@ class NifiInstance:
             except KeyError:
                 password = getpass.getpass('Password: ')
 
+        access_token = None
         try:
-            access_token = nifi.AccessApi().create_access_token(username=username,password=password)            
+            access_token = nifi.AccessApi().create_access_token(username=config.nifi_config.username,password=password)            
         except nifi.rest.ApiException as e:
-            print("Exception when calling AccessApi->create_access_token: %s\n" % e)
+            print('Exception when calling AccessApi->create_access_token: %s\n'.format(e))
 
         config.nifi_config.api_key[username] = access_token
         config.nifi_config.api_client = nifi.ApiClient(header_name='Authorization', header_value='Bearer {}'.format(access_token))        
@@ -82,13 +83,17 @@ class NifiInstance:
             nipyapi.nifi.TemplateEntity 
         """
 
-        template = templates.create_template(
-            pg_id=pg_id,
-            name=name,
-            desc=desc
-            )
+        try:
+            obj = templates.create_template(
+                pg_id=pg_id,
+                name=name,
+                desc=desc
+                )
+        except nifi.rest.ApiException as e:
+            print(e.body)
+            return None
 
-        return template
+        return obj.template
 
     
     def delete_template(self, template_id):

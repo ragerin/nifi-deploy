@@ -17,28 +17,28 @@ def export_function(args):
     name            = args.name
     description     = args.description
     filename        = args.filename
-    stdout          = args.stdout
+    quiet           = args.quiet
     keep_template   = args.keep_template
 
     n = NifiInstance(nifi_host, username=username, password=password)
     template_id = None
 
-    try:
-        template_id = n.create_template(
-            pg_id=uuid,
-            name=name,
-            desc=description
-            ).template.id
-        
-        r = n.export_template(template_id, filename)
-        if args.stdout:
-            print(r)
-        elif not args.stdout and not args.filename:
-            print(r)
-        
-    finally:
-        if not args.keep_template:
-            n.delete_template(template_id)
+    template = n.create_template(
+        pg_id=uuid,
+        name=name,
+        desc=description
+        )
+    
+    if not template:
+        return
+    
+    content = n.export_template(template.id, filename)
+
+    if not args.quiet:
+        print(content)
+    
+    if not args.keep_template and template:
+        n.delete_template(template.id)
 
 
 def import_function(args):
@@ -70,7 +70,7 @@ def cli():
     parser_export.add_argument('-p', '--password', help='Nifi password, else using environment variable `NIFI_PASSWORD`')
     parser_export.add_argument('-d', '--description', help='Description of the template - also used internally if `--keep_template` is included')
     parser_export.add_argument('-f', '--filename', help='Path to save exported XML to')
-    parser_export.add_argument('-s', '--stdout', action='store_true', default=False, help='Output exported XML to stdout - default if `--filename` is not supplied')
+    parser_export.add_argument('-q', '--quiet', action='store_true', default=False, help='Do not output exported XML to stdout')
     parser_export.add_argument('-k', '--keep_template', action='store_true', default=False, help='Keep the template in Nifi after export, else exclusively export XML and delete the temporarily instantiated template')
     parser_export.set_defaults(func=export_function)
 
