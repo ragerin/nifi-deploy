@@ -1,0 +1,24 @@
+CHANGES
+=======
+
+0.1.4
+-----
+
+* fixed relative import issue2
+
+0.1.3
+-----
+
+* another change to entry\_points..
+* fixing another entry\_point issue
+* fixed setup.cfg missing entry\_point section, added ChangeLog to .gitignore
+
+0.1.0
+-----
+
+* removed redundant magics in \_\_init\_\_.py
+* prepped for pypi release
+* reverted init
+* prepping for pbr packaging
+* added docstrings, cleaned up a bit
+* init commit
