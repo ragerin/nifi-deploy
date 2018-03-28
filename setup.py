@@ -29,7 +29,7 @@ setup(
     install_requires=[
         'nipyapi==0.8.0',
         'requests==2.18.4',
-    ]
+    ],
     entry_points={
         'console_scripts': [
             'nifi-deploy = nifi_deploy.nifi_deploy:cli',
