@@ -2,11 +2,14 @@
 This file is used for the CLI tool.
 By default setup.py links `nifi-deploy` as an executable
 to this file.
+If you need to run this from source, run as a module 
+with the `python -m` syntax.
 """
 
 import argparse
 
-from nifi import NifiInstance
+from nifi_deploy.nifi import NifiInstance
+from nifi_deploy import __version__
 
 
 def export_function(args):
@@ -55,6 +58,7 @@ def import_function(args):
 def cli():
     ### argparse setup
     parser = argparse.ArgumentParser(prog='nifi-deploy')
+    parser.add_argument('-v', '--version', action='store_true', default=False)
     subparsers = parser.add_subparsers(title='Actions', help='Append `--help` to view action specific help')
 
 
@@ -89,6 +93,9 @@ def cli():
 
     ### show usage help
     args = parser.parse_args()
+    if getattr(args, 'version', None):
+        print(__version__)
+        return
     if getattr(args, 'func', None):
         args.func(args)
     else:

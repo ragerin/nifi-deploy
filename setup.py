@@ -1,8 +1,9 @@
 from setuptools import setup
+from nifi_deploy import __version__
 
 setup(
     name='nifi-deploy',
-    version='0.1.6',
+    version=__version__,
     description='Easy CLI tool for exporting and importing Nifi templates to and from XML files.',
     long_description='Easy CLI tool for exporting and importing Nifi templates to and from XML files.',
     # url='',
