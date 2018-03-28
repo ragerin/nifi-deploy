@@ -64,7 +64,7 @@ def cli():
 
     ### export subparser
     example_usage = """EXAMPLE USAGE:
-    nifi-deploy export -n https://nifihost:9090 -u john -p badpractice 0a7361fd-015f-1000-ffff-ffffd2cbc7a7 my_great_template -d template description -f c:\\temp\\my_great_template_export.xml
+    nifi-deploy export -n https://nifihost:9090 -u john -p badpractice 0a7361fd-015f-1000-ffff-ffffd2cbc7a7 my_great_template -d template description -f c:\\temp\\my_great_template_export.xml --keep_template
     """
     parser_export = subparsers.add_parser('export', epilog=example_usage)
     parser_export.add_argument('uuid', help='UUID of a process group to export as a template XML')
