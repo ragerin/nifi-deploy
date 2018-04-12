@@ -27,7 +27,7 @@ workflow with VCS.
 
 
 
-.. |docs| image :: https://readthedocs.org/projects/nifi-deploy/badge/?version=latest/
+.. |docs| image:: https://readthedocs.org/projects/nifi-deploy/badge/?version=latest/
     :alt: Documentation Status
     :scale: 100%
     :target: https://readthedocs.io/projects/nifi-deploy/badge/
