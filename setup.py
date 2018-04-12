@@ -1,12 +1,21 @@
+import os
+
 from setuptools import setup
 from nifi_deploy import __version__
+
+
+here = os.path.abspath(os.path.dirname(__file__))
+readme = ''
+
+with io.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+    readme = '\n' + f.read()
 
 setup(
     name='nifi-deploy',
     version=__version__,
     description='Easy CLI tool for exporting and importing Nifi templates to and from XML files.',
-    long_description='Easy CLI tool for exporting and importing Nifi templates to and from XML files.',
-    # url='',
+    long_description=readme,
+    url='https://pypi.org/project/nifi-deploy/',
     author='Mads H. Jakobsen',
     author_email='mads@hgaard.net',
     license='MIT',
@@ -30,6 +39,7 @@ setup(
     install_requires=[
         'nipyapi==0.8.0',
         'requests==2.18.4',
+        'pyopenssl==17.5.0',
     ],
     entry_points={
         'console_scripts': [
