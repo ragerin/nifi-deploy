@@ -2,14 +2,9 @@
 This file is used for the CLI tool.
 By default setup.py links `nifi-deploy` as an executable
 to this file.
-If you need to run this from source, run as a module 
-with the `python -m` syntax.
 """
 
 import argparse
-
-from nifi_deploy.nifi import NifiInstance
-from nifi_deploy import __version__
 
 
 def export_function(args):
@@ -58,13 +53,13 @@ def import_function(args):
 def cli():
     ### argparse setup
     parser = argparse.ArgumentParser(prog='nifi-deploy')
-    parser.add_argument('-v', '--version', action='store_true', default=False)
+    parser.add_argument('-v', '--version', action='store_true', default=False) 
     subparsers = parser.add_subparsers(title='Actions', help='Append `--help` to view action specific help')
 
 
     ### export subparser
     example_usage = """EXAMPLE USAGE:
-    nifi-deploy export -n https://nifihost:9090 -u john -p badpractice 0a7361fd-015f-1000-ffff-ffffd2cbc7a7 my_great_template -d template description -f c:\\temp\\my_great_template_export.xml --keep_template
+    nifi-deploy export -n https://nifihost:9090 0a7361fd-015f-1000-ffff-ffffd2cbc7a7 my_great_template -u john -p badpractice -d template description -f c:\\temp\\my_great_template_export.xml --keep_template
     """
     parser_export = subparsers.add_parser('export', epilog=example_usage)
     parser_export.add_argument('uuid', help='UUID of a process group to export as a template XML')
@@ -81,7 +76,7 @@ def cli():
 
     ### import subparser
     example_usage = """EXAMPLE USAGE:
-    nifi-deploy import -n https://nifihost:9090 -u john -p badpractice c:\\temp\\my_great_template_export.xml
+    nifi-deploy import -n https://nifihost:9090 c:\\temp\\my_great_template_export.xml -u john -p badpractice
     """
     parser_import = subparsers.add_parser('import', epilog=example_usage)
     parser_import.add_argument('filename', help='Path to template XML file for uploading to Nifi')
@@ -102,5 +97,18 @@ def cli():
         parser.print_help()
 
 
-if __name__ == '__main__':
+if not __name__ == '__main__':
+    from . import __version__
+    from .nifi import NifiInstance
+
+else:
+    # HACK: Extract version with regex from __init__.py when run as a script
+    import os
+    from re import compile
+    pattern = compile('__version__\s+=\s+\'(.*)\'')
+    path = os.path.join( os.path.dirname(os.path.realpath(__file__)), '__init__.py' )
+    with open(path) as fd:
+        __version__ = pattern.search(fd.read()).group(1)
+    #
+    from nifi import NifiInstance
     cli()
