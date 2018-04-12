@@ -7,7 +7,7 @@ from nifi_deploy import __version__
 here = os.path.abspath(os.path.dirname(__file__))
 readme = ''
 
-with io.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
     readme = '\n' + f.read()
 
 setup(
